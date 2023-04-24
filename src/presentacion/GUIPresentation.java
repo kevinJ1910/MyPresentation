@@ -3,10 +3,7 @@ package presentacion;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.util.Arrays;
 
 public class GUIPresentation extends JFrame {
@@ -19,7 +16,6 @@ public class GUIPresentation extends JFrame {
 
     public GUIPresentation() {
         iniGUI();
-        //actionMouse();
         this.setTitle("My Presentation");
         this.setSize(600, 400);
         this.setVisible(true);
@@ -34,7 +30,6 @@ public class GUIPresentation extends JFrame {
         myExpectations = new JButton("This is my expectations");
         escucha = new Escucha();
 
-
         Arrays.asList(myExpectations, myPhoto, myHobby).forEach(containerButtons -> containerButtons.setBorder(BorderFactory.createLineBorder(Color.lightGray, 3, true)));
         Arrays.asList(myExpectations, myPhoto, myHobby).forEach(containerButtons -> containerButtons.setBackground(Color.ORANGE));
         Arrays.asList(myExpectations, myPhoto, myHobby).forEach(containerButtons -> containerButtons.setForeground(Color.BLUE));
@@ -48,9 +43,10 @@ public class GUIPresentation extends JFrame {
         containerButtons.setBackground(Color.red);
         containerImage.setBackground(Color.BLUE);
         expectations.setFont(new Font(Font.SANS_SERIF, Font.BOLD + Font.ITALIC, 15));
-
-
         containerImage.setBorder(BorderFactory.createTitledBorder(null, "About Me", TitledBorder.CENTER, TitledBorder.DEFAULT_JUSTIFICATION, new Font(Font.MONOSPACED, Font.PLAIN, 20), Color.PINK));
+
+        buttonExpectations();
+
         containerImage.add(imageLabel);
         containerButtons.add(myExpectations);
         containerButtons.add(myHobby);
@@ -60,10 +56,25 @@ public class GUIPresentation extends JFrame {
         myHobby.addMouseListener(escucha);
         myExpectations.addKeyListener(escucha);
 
-
         this.add(title, BorderLayout.NORTH);
         this.add(containerButtons, BorderLayout.SOUTH);
         this.add(containerImage, BorderLayout.CENTER);
+    }
+
+    private void buttonExpectations() {
+        myExpectations.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("M"), "showText");
+        myExpectations.getActionMap().put("showText", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                containerImage.removeAll();
+                expectations.setText("Mis expectativas referentes al curso son grandes, siento que puedo adquirir un conocimiento muy relevante para mi\n carrera el cual me ayudara a ser mas eficaz y a desempeñarme mejor en la programacion.\n Mi contacto es: kevin.jordan@correounivalle.edu.co ");
+
+                expectations.setBackground(null);
+                expectations.setForeground(Color.orange);
+                containerImage.add(expectations);
+                containerImage.revalidate();
+                containerImage.repaint();
+            }
+        });
     }
 
     public static void main(String[] args) {
@@ -76,37 +87,26 @@ public class GUIPresentation extends JFrame {
     }
 
     private class Escucha implements MouseListener, KeyListener {
-
         private ImageIcon image;
 
-
+        @Override
         public void mouseClicked(MouseEvent e) {
-            imageLabel.setIcon(null);
-            containerImage.remove(expectations);
-
-            if (e.getSource() == myPhoto) {
-                this.image = new ImageIcon(getClass().getResource("/recursos/yo.jpg"));
-                imageLabel.setIcon(image);
-            } else if (e.getSource() == myHobby && e.getClickCount() == 2) {
-                this.image = new ImageIcon(getClass().getResource("/recursos/futbol.jpg"));
-                imageLabel.setIcon(image);
-            }
-            revalidate();
-            repaint();
-        }
-
-        public void keyPressed(KeyEvent e) {
-
-            if (e.getKeyChar() == 'm') {
+            if(e.getSource() == myPhoto && e.getClickCount() == 1) {
                 imageLabel.setIcon(null);
                 containerImage.remove(expectations);
-                expectations.setText("Mis expectativas referentes al curso son grandes, siento que puedo adquirir un conocimiento muy relevante para mi\n carrera el cual me ayudara a ser mas eficaz y a desempeñarme mejor en la programacion.\n Mi contacto es: kevin.jordan@correounivalle.edu.co ");
-
-                containerImage.add(expectations);
-                expectations.setForeground(Color.orange);
-                expectations.setBackground(null);
+                this.image = new ImageIcon(getClass().getResource("/recursos/yo.jpg"));
+                imageLabel.setIcon(image);
+                containerImage.add(imageLabel);
             }
-            revalidate();
+
+            else if(e.getSource() == myHobby && e.getClickCount() == 2) {
+                imageLabel.setIcon(null);
+                containerImage.remove(imageLabel);
+                containerImage.remove(expectations);
+                this.image = new ImageIcon(getClass().getResource("/recursos/futbol.jpg"));
+                imageLabel.setIcon(image);
+                containerImage.add(imageLabel);
+            }
             repaint();
         }
 
@@ -117,5 +117,6 @@ public class GUIPresentation extends JFrame {
         public void mouseReleased(MouseEvent e) {}
         public void keyReleased(KeyEvent e) {}
         public void keyTyped(KeyEvent e) {}
+        public void keyPressed(KeyEvent e) {}
     }
 }
